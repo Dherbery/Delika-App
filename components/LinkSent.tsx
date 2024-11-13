@@ -16,7 +16,7 @@ import { RootStackParamList } from "../App";
 interface LinkSentProps {
   visible: boolean;
   onClose: () => void;
-  email: string;
+  email?: string;
   onShowOTP: () => void;
 }
 interface LinkSentProps {

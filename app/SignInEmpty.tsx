@@ -21,10 +21,42 @@ type RootStackParamList = {
   // ... other screens
 };
 
+// Add this interface near the top of the file
+interface UserData {
+  id: string;
+  OTP: number;
+  role: string;
+  email: string;
+  image: {
+    url: string;
+    meta: any;
+    mime: string;
+    name: string;
+    path: string;
+    size: number;
+    type: string;
+    access: string;
+  };
+  branchId: string;
+  fullName: string;
+  created_at: number;
+  phoneNumber: string;
+  restaurantId: string;
+  branchesTable: {
+    id: string;
+    branchName: string;
+    branchLocation: string;
+  };
+  _restaurantTable: [{
+    id: string;
+    restaurantName: string;
+  }];
+}
+
 const SignInEmpty = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [authToken, setAuthToken] = useState("");
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
@@ -63,8 +95,20 @@ const SignInEmpty = () => {
         })
       });
 
+      // Save complete response details
       const loginData = await loginResponse.json();
+      const responseHeaders = Object.fromEntries(loginResponse.headers.entries());
       
+      // Store comprehensive response information
+      await AsyncStorage.setItem('loginResponse', JSON.stringify({
+        data: loginData,
+        status: loginResponse.status,
+        statusText: loginResponse.statusText,
+        headers: responseHeaders,
+        url: loginResponse.url,
+        timestamp: new Date().toISOString()
+      }));
+
       if (!loginResponse.ok) {
         setShowFailedModal(true);
         return;
@@ -88,20 +132,34 @@ const SignInEmpty = () => {
 
       const userData = await userResponse.json();
       
-      // Store all user data
+      // Store all user details
       const userDataToStore = {
         id: userData.id,
-        email: userData.email,
+        OTP: userData.OTP,
         role: userData.role,
-        restaurantId: userData.restaurantId,
+        email: userData.email,
+        image: userData.image,
         branchId: userData.branchId,
-        created_at: userData.created_at
+        fullName: userData.fullName,
+        created_at: userData.created_at,
+        phoneNumber: userData.phoneNumber,
+        restaurantId: userData.restaurantId,
+        branchesTable: userData.branchesTable,
+        _restaurantTable: userData._restaurantTable
       };
 
+      // Save to AsyncStorage
       await AsyncStorage.setItem('userData', JSON.stringify(userDataToStore));
-      
-      // Update state with user data
-      setUserData(userData);
+      await AsyncStorage.setItem('userRole', userData.role);
+      await AsyncStorage.setItem('userEmail', userData.email);
+      await AsyncStorage.setItem('userId', userData.id);
+      await AsyncStorage.setItem('userFullName', userData.fullName);
+      await AsyncStorage.setItem('userPhoneNumber', userData.phoneNumber);
+      await AsyncStorage.setItem('restaurantId', userData.restaurantId);
+      await AsyncStorage.setItem('branchId', userData.branchId);
+
+      // Update state variables
+      setUserData(userDataToStore);
       setUserId(userData.id);
       setCreatedAt(userData.created_at);
       setRestaurantId(userData.restaurantId);
@@ -113,6 +171,7 @@ const SignInEmpty = () => {
       
       // Navigate to Home after successful login
       setTimeout(() => {
+        console.log('Attempting navigation to Home');
         navigation.navigate('Home');
       }, 2000);
 
@@ -459,6 +518,13 @@ const styles = StyleSheet.create({
   okButtonText: {
     color: "#FFFFFF",
     fontSize: FontSize.bodyMediumSemiBold_size,
+  },
+  input: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.neutral100,  // Assuming this is your text color
+    paddingVertical: 12,     // More vertical padding
+    letterSpacing: 0.5,      // Slightly increased letter spacing
   },
 });
 

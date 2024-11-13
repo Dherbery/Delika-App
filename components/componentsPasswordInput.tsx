@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     color: '#000',
+    fontSize: 16,
   },
   visibilityIcon: {
     padding: 10,

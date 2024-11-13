@@ -29,6 +29,7 @@ const EnterYourPhonenumber = () => {
   const [showCountryPicker, setShowCountryPicker] = useState(false)
   const [showOTP, setShowOTP] = useState(false);
   const [showLinkSent, setShowLinkSent] = useState(false);
+  const [email, setEmail] = useState("noreply@krontiva.africa");
 
   useEffect(() => {
     // Load saved email when component mounts
@@ -60,30 +61,32 @@ const EnterYourPhonenumber = () => {
   };
 
   const handleSendLink = async () => {
-    console.log('Current phone state:', {phoneNumber, phoneCode});
-    
-    // Check for valid phone number
     if (!phoneNumber || phoneNumber.trim() === '') {
       Alert.alert('Error', 'Please enter a valid phone number');
       return;
     }
 
     const fullPhoneNumber = `${phoneCode}${phoneNumber}`.trim();
-    console.log('Attempting to send link for:', fullPhoneNumber);
+    console.log('Sending request for phone:', fullPhoneNumber);
     
     try {
       const response = await fetch('https://api-server.krontiva.africa/api:uEBBwbSs/reset/user/password/sms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({ phoneNumber: fullPhoneNumber })
+        body: JSON.stringify({ 
+          phoneNumber: fullPhoneNumber
+        })
       });
 
       const data = await response.json();
+      console.log('API Response:', data);
       
       if (response.ok) {
         setShowLinkSent(true);
+        setShowOTP(true);
       } else {
         Alert.alert('Error', data.message || 'Failed to send reset link');
       }
@@ -194,16 +197,19 @@ const EnterYourPhonenumber = () => {
       <OTP 
         visible={showOTP}
         onClose={() => setShowOTP(false)}
-        onVerify={(code) => console.log(code)}
+        onVerify={handleVerifyOTP}
         phoneNumber={`${phoneCode}${phoneNumber}`}
-        email=""
+        email={email}
       />
       <LinkSent 
         visible={showLinkSent}
-        onClose={() => setShowLinkSent(false)}
+        onClose={() => {
+          setShowLinkSent(false);
+          setShowOTP(true);  // Show OTP modal when link sent modal is closed
+        }}
         onShowOTP={() => setShowOTP(true)}
         phoneNumber={`${phoneCode}${phoneNumber}`}
-        email=""
+        email={email}
       />
     </View>
   );

@@ -34,13 +34,14 @@ const EmailInput: React.FC<EmailInputProps> = ({
             source={require("../assets/email.png")}
           />
           <TextInput
-            style={[styles.enterEmail, styles.emailTypo]}
-            placeholder={placeholder}
-            value={value}
-            onChangeText={onChangeText}
-            keyboardType={keyboardType}
-            autoCapitalize={autoCapitalize}
-            placeholderTextColor={GlobalStyles.Color.neutral60}
+             style={styles.input}
+             placeholder={placeholder}
+             value={value}
+             onChangeText={onChangeText}
+             autoCapitalize={autoCapitalize}
+             editable={true}
+             keyboardType="email-address"
+             placeholderTextColor="#666"  // Changed from #9CA4AB to #666 to match password
           />
         </View>
       </View>
@@ -86,6 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
     width: 327,
+    fontSize: 16,
   },
   inputField: {
     gap: GlobalStyles.Gap.gap_md,

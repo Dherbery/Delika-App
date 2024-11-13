@@ -10,6 +10,14 @@ import { View } from 'react-native';
 import EnterYourPhonenumber from './app/EnterYourPhonenumber';
 import NewPassword from './app/NewPassword';
 import { LogBox } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Home from './app/Home';
+import Filter, { Props as FilterProps } from './components/Filter';
+import orders from './app/orders';
+
+
+
+
 
 LogBox.ignoreLogs(['Support for defaultProps will be removed from function components']);
 
@@ -27,6 +35,8 @@ export type RootStackParamList = {
   OTP: {
     phoneNumber: string;
   };
+  Filter: FilterProps;
+  orders: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -50,8 +60,8 @@ function App() {
   }
 
   return (
-    <View onLayout={onLayoutRootView}>
-      <NavigationContainer>
+    <NavigationContainer>
+      <View onLayout={onLayoutRootView}>
         <Stack.Navigator>
           <Stack.Screen name="SignInEmpty" component={SignInEmpty} />
           <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
@@ -70,9 +80,25 @@ function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="NewPassword" component={NewPassword} />
+          <Stack.Screen 
+            name="Home" 
+            component={Home}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Filter" 
+            component={(props: NativeStackScreenProps<RootStackParamList, 'Filter'>) => (
+              <Filter 
+                {...props.route.params}
+                visible={true}
+                onClose={() => {}}
+              />
+            )}
+          />
+          <Stack.Screen name="orders" component={orders} />
         </Stack.Navigator>
-      </NavigationContainer>
-    </View>
+      </View>
+    </NavigationContainer>
   );
 }
 
